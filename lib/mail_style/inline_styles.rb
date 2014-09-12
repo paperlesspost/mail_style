@@ -134,8 +134,8 @@ module MailStyle
         # Grab all the styles that are inside <style> elements already in the document
         @inline_rules = ""
         document.css("style").each do |style|
-          # Do not inline print media styles
-          next if style['media'] == 'print'
+          # Do not inline print media styles or screen media for queries
+          next if style['media'] == 'print' || style['media'] == 'screen'
 
           # <style data-immutable="true"> are kept in the document
           next if style['data-immutable'] == 'true'
