@@ -1,6 +1,6 @@
 # encoding: utf-8
 require 'rake'
-require 'rake/rdoctask'
+require 'rdoc/task'
 
 begin
   require 'spec/rake/spectask'

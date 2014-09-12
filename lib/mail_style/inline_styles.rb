@@ -12,6 +12,10 @@ module MailStyle
         create_mail_without_inline_styles
       end
 
+      def create_html_with_inline_styles(html)
+        parse_html(html, true)
+      end
+
       protected
 
       # Flatten nested parts
@@ -42,9 +46,9 @@ module MailStyle
         selected
       end
 
-      def parse_html(html)
+      def parse_html(html, is_partial)
         # Parse original html
-        html_document = create_html_document(html)
+        html_document = create_html_document(html, is_partial)
         html_document = absolutize_image_sources(html_document)
 
         # Write inline styles
@@ -99,27 +103,33 @@ module MailStyle
 
       # Create Nokogiri html document from part contents and add/amend certain elements.
       # Reference: http://www.creativeglo.co.uk/email-design/html-email-design-and-coding-tips-part-2/
-      def create_html_document(body)
-        # Add doctype to html along with body
-        document = Nokogiri::HTML.parse(DOCTYPE + body)
+      def create_html_document(body, is_partial)
 
-        # Set some meta stuff
-        html = document.at_css('html')
-        html['xmlns'] = 'http://www.w3.org/1999/xhtml'
+        if (!is_partial)
+          # Add doctype to html along with body
+          document = Nokogiri::HTML.parse(DOCTYPE + body)
 
-        # Create <head> element if missing
-        head = document.at_css('head')
+          # Set some meta stuff
+          html = document.at_css('html')
+          html['xmlns'] = 'http://www.w3.org/1999/xhtml'
 
-        unless head.present?
-          head = Nokogiri::XML::Node.new('head', document)
-          document.at_css('body').add_previous_sibling(head)
+          # Create <head> element if missing
+          head = document.at_css('head')
+
+          unless head.present?
+            head = Nokogiri::XML::Node.new('head', document)
+            document.at_css('body').add_previous_sibling(head)
+          end
+
+          # Add utf-8 content type meta tag
+          meta = Nokogiri::XML::Node.new('meta', document)
+          meta['http-equiv'] = 'Content-Type'
+          meta['content'] = 'text/html; charset=utf-8'
+          head.add_child(meta)
+        else
+          # Get parsed partial only from HTML render
+          document = Nokogiri::HTML.fragment(body)
         end
-
-        # Add utf-8 content type meta tag
-        meta = Nokogiri::XML::Node.new('meta', document)
-        meta['http-equiv'] = 'Content-Type'
-        meta['content'] = 'text/html; charset=utf-8'
-        head.add_child(meta)
 
         # Grab all the styles that are inside <style> elements already in the document
         @inline_rules = ""
@@ -133,7 +143,6 @@ module MailStyle
           @inline_rules << style.content
           style.remove
         end
-
         # Return document
         document
       end
@@ -207,5 +216,3 @@ module MailStyle
     end
   end
 end
-
-ActionMailer::Base.send :include, MailStyle::InlineStyles
