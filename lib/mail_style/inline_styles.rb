@@ -79,7 +79,12 @@ module MailStyle
           current_style = element['style'].to_s.split(';').sort
 
           # Elements new styles
-          new_style = attributes.map{|attribute, style| "#{attribute}: #{update_image_urls(style[:value])}"}
+          if is_partial
+            new_style = attributes.map{|attribute, style| "#{attribute}: #{style[:value]}"}
+          else
+            new_style = attributes.map{|attribute, style| "#{attribute}: #{update_image_urls(style[:value])}"}
+          end
+          
 
           # Concat styles
           style = (current_style + new_style).compact.uniq.map(&:strip).sort
