@@ -5,10 +5,10 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mail_style}
-  s.version = "0.1.6"
+  s.version = "0.1.6.paperless"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Jim Neath"]
+  s.authors = ["Jim Neath","Joe Natalzia"]
   s.date = %q{2010-05-03}
   s.description = %q{Making HTML emails a little less painful. Writes css inline and corrects image urls.}
   s.email = %q{jimneath@googlemail.com}
