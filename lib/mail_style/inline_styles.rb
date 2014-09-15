@@ -49,7 +49,7 @@ module MailStyle
       def parse_html(html, is_partial)
         # Parse original html
         html_document = create_html_document(html, is_partial)
-        html_document = absolutize_image_sources(html_document)
+        html_document = absolutize_image_sources(html_document) unless is_partial
 
         # Write inline styles
         element_styles = {}
